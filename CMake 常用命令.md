@@ -1,3 +1,5 @@
+# CMake 常用命令
+
 CMake 是一种跨平台的构建系统生成器，可以自动生成用于编译、测试和打包 C/C++ 代码的 Makefile 或者 IDE 项目文件。本教程将为您提供 CMake 的基本使用教程。
 
 ## 安装 CMake
@@ -81,13 +83,13 @@ make
 
 CMake 官方文档 https://cmake.org/documentation/
 
-CMake 中文文档 https://runebook.dev/zh-CN/docs/cmake/-index-CMake 
+CMake 中文文档 https://runebook.dev/zh-CN/docs/cmake/-index-CMake
 
 Modern CMake 简体中文版 https://modern-cmake-cn.github.io/Modern-CMake-zh_CN/
 
-CMake菜谱（CMake Cookbook中文版）https://www.bookstack.cn/read/CMake-Cookbook/README.md
+CMake 菜谱（CMake Cookbook 中文版）https://www.bookstack.cn/read/CMake-Cookbook/README.md
 
-CMake实例：CMakeLearn 项目 https://github.com/SuperH-0630/CMakeLearn
+CMake 实例：CMakeLearn 项目 https://github.com/SuperH-0630/CMakeLearn
 
 ## 设置编译选项
 

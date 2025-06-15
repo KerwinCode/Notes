@@ -1,4 +1,6 @@
-EnTT 是一个仅面向头文件的，轻量且易于使用的游戏编程库，是基于 C++17 标准的 ECS 架构的实现，旨在为游戏和交互式应用程序提供高效和可扩展性的技术解决方案。Minecraft、ArcGIS Runtime SDK、Ragdoll等都使用了EnTT。
+# ECS 的现代 C++ 实现：EnTT
+
+EnTT 是一个仅面向头文件的，轻量且易于使用的游戏编程库，是基于 C++17 标准的 ECS 架构的实现，旨在为游戏和交互式应用程序提供高效和可扩展性的技术解决方案。Minecraft、ArcGIS Runtime SDK、Ragdoll 等都使用了 EnTT。
 
 后面各节简要说明了如何使用实体组件系统（整个库的核心部分）。
 
@@ -459,7 +461,7 @@ unset 则用于在需要时清除变量
 
 这些函数按执行顺序添加到组织者。非成员函数和成员函数被提升为模板参数，但是也有可能将指向非成员函数的指针或 lambdas 作为参数传递给 emplace 成员函数：
 
-```c++
+````c++
 entt::organizer organizer;
 
 // 向组织者添加非成员函数
@@ -470,8 +472,8 @@ clazz instance;
 organizer.emplace<&clazz::member_function>(&instance);
 
 // 直接添加一个 lambda
-organizer.emplace(+[](const void *, entt::registry &) { /* ... */ });``` 
-```
+organizer.emplace(+[](const void *, entt::registry &) { /* ... */ });```
+````
 
 对注册表的可能常量引用。在运行时传递给任务的值也将按原样传递给函数。
 
@@ -481,10 +483,10 @@ organizer.emplace(+[](const void *, entt::registry &) { /* ... */ });```
 
 作为参数传递给 emplace 的非成员函数和 lambda 函数的函数类型为 `void(const void*，entt::registry＆)`。注册表与提供给任务的注册表相同。第一个参数是指向用户定义数据的可选指针，以在注册时提供：
 
-```c++
+````c++
 clazz instance;
-organizer.emplace(+[](const void *, entt::registry &) { /* ... */ }, &instance);``` 
-```
+organizer.emplace(+[](const void *, entt::registry &) { /* ... */ }, &instance);```
+````
 
 在所有情况下，创建时都可以将名称与任务相关联。例如：
 
@@ -589,7 +591,7 @@ clone_functions[entt::type_hash<velocity>::value()] = &clone<velocity>;
 
 使用这样的映射，使得对注册表进行 Stamping 变得很简单：
 
-```c++
+````c++
 entt::registry from;
 entt::registry to;
 
@@ -597,8 +599,8 @@ entt::registry to;
 
 from.visit([this, &to](const auto type_id) {
     clone_functions[type_id](from, to);
-});``` 
-```
+});```
+````
 
 自定义克隆函数也很容易定义。此外，也可以通过这种方式克隆专门使用不同标识符的注册表。
 
@@ -656,7 +658,7 @@ from.visit(src, [this, &to, dst](const auto type_id) {
 
 注册表类提供了对序列化的基本支持。
 
-它不会将组件直接转换为字节，因此不需要其他工具来进行序列化。相反，它接受具有对应接口（即档案 *archive* ）的不透明对象，并使用这个对象来序列化其内部数据结构，并在以后需要的时候还原它们。而怎么将类型和实例转换为一堆字节完全由档案来负责。
+它不会将组件直接转换为字节，因此不需要其他工具来进行序列化。相反，它接受具有对应接口（即档案 _archive_ ）的不透明对象，并使用这个对象来序列化其内部数据结构，并在以后需要的时候还原它们。而怎么将类型和实例转换为一堆字节完全由档案来负责。
 
 序列化部分的目标是允许用户生成整个注册表的转储或小范围快照，即只关注用户感兴趣的组件。
 
@@ -683,12 +685,12 @@ component 成员函数是函数模板，其目的是存储备用组件。
 
 component 成员函数还有另一个版本，它接受一系列需要序列化的实体。因为一些内部原因，它会多次迭代实体范围，所以会比另一个版本慢一些。但是可以用来过滤掉不需要序列化的实体。
 
-```c++
+````c++
 const auto view = registry.view<serialize>();
 output_archive output;
 
-entt::snapshot{registry}.component<a_component, another_component>(output, view.cbegin(), view.cend());``` 
-```
+entt::snapshot{registry}.component<a_component, another_component>(output, view.cbegin(), view.cend());```
+````
 
 这个版本可以在不调用 entities 成员函数的情况下正常工作。
 
@@ -754,9 +756,9 @@ void operator()(std::underlying_type_t<entt::entity>);
 
 此外，对于要序列化的每种类型，档案必须接受一对实体和组件。因此，给定一个类型 T，档案必须包含具有以下签名的函数调用运算符：
 
-```c++
-void operator()(entt::entity, const T &);``` 
-```
+````c++
+void operator()(entt::entity, const T &);```
+````
 
 如何序列化数据由输出档案自己自由决定，注册表不受其影响。
 
@@ -764,9 +766,9 @@ void operator()(entt::entity, const T &);```
 
 还原快照时使用的档案，必须暴露具有以下签名的函数调用运算符以加载实体：
 
-```c++
-void operator()(entt::entity &);``` 
-```
+````c++
+void operator()(entt::entity &);```
+````
 
 其中 `entt::entity` 是注册表使用的实体的类型。每次调用该函数时，档案都必须从基础存储 (underlying storage) 中读取下一个元素，并将其复制到给定的变量中。
 
@@ -799,7 +801,7 @@ EnTT 附带了一些示例（实际上是一些测试），这些示例显示了
 - 视图：是一种非侵入性工具，用于访问实体和组件，而不会影响其他功能或增加内存消耗。
 - 组：是一种侵入性工具，可以在关键路径上实现更高的性能，但会为此导致一些其他问题。
 
-视图主要有两种：编译时 *compile-time* （view）和运行时 runtime （runtime_view）。
+视图主要有两种：编译时 _compile-time_ （view）和运行时 runtime （runtime_view）。
 
 前者需要组件类型的编译时列表，因此可以进行多项优化。后者可以在运行时构造，而不是使用整型标识符，不过迭代速度要慢一些。
 
@@ -837,9 +839,9 @@ auto multi = registry.view<position, velocity>();
 
 支持按组件过滤实体:
 
-```c++
-auto view = registry.view<position, velocity>(entt::exclude<renderable>);``` 
-```
+````c++
+auto view = registry.view<position, velocity>(entt::exclude<renderable>);```
+````
 
 要迭代视图，使用 range-for 循环:
 
@@ -1117,7 +1119,7 @@ auto group = registry.group<>(entt::get<position, velocity>, entt::exclude<rende
 
 这意味着嵌套组通过以新组件的形式添加更多条件来扩展它们的父组。
 
-正如前面所提到的，组件不一定都是拥有的 ( *owned* )，这样两个组就可以被认为是嵌套的。下列定义完全有效:
+正如前面所提到的，组件不一定都是拥有的 ( _owned_ )，这样两个组就可以被认为是嵌套的。下列定义完全有效:
 
 - `registry.group<sprite>(entt::get<renderable>)`
 - `registry.group<sprite, transform>(entt::get<renderable>)`
@@ -1225,7 +1227,7 @@ registry.orphans([](auto entity) {
 });
 ```
 
-要测试单个实体的 *orphanity* ，请改用成员函数 orphan。它接受有效的实体标识符作为参数，并在实体为 *orphanity* 的情况下返回 true，否则返回 false。
+要测试单个实体的 _orphanity_ ，请改用成员函数 orphan。它接受有效的实体标识符作为参数，并在实体为 _orphanity_ 的情况下返回 true，否则返回 false。
 
 通常，所有这些函数都可能导致性能下降。
 
@@ -1303,7 +1305,7 @@ registry.sort<empty_type>([](const entt::entity lhs, const entt::entity rhs) {
 
 可以通过定义 ENTT_NO_ETO 宏来禁用此优化。在这种情况下，无论如何，空类型都将像其他所有类型一样对待。
 
-# 7.  多线程
+# 7. 多线程
 
 通常，整个注册表不是线程安全的。出于多种原因，线程安全并不是用户需要的。例如为了性能。
 

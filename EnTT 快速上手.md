@@ -1,3 +1,5 @@
+# EnTT 快速上手
+
 EnTT 是一个现代 C++ 实现的 ECS ，它提供了一种轻量级和高效的方式来管理实体和组件。下面是 EnTT 的使用方法：
 
 ### 安装
@@ -164,7 +166,7 @@ entt::registry registry;
 registry.on_update(update_system);
 ```
 
-`entt::system<void(entt::registry&)>`是一个函数对象类型，它表示一个可以接受 EnTT 实体注册表作为参数的系统。其中，`void`表示该系统不返回任何值。在使用时，可以将一个函数指针或者lambda表达式转换为这个类型，并传递给 EnTT 的`basic_registry::on_update`函数，使其在每个帧更新时被调用。用于注册一个每帧更新时调用`update_position`函数的系统。这样，在每个帧更新时，`update_position`函数将被调用，并遍历所有具有`Position`组件的实体，更新它们的位置。
+`entt::system<void(entt::registry&)>`是一个函数对象类型，它表示一个可以接受 EnTT 实体注册表作为参数的系统。其中，`void`表示该系统不返回任何值。在使用时，可以将一个函数指针或者 lambda 表达式转换为这个类型，并传递给 EnTT 的`basic_registry::on_update`函数，使其在每个帧更新时被调用。用于注册一个每帧更新时调用`update_position`函数的系统。这样，在每个帧更新时，`update_position`函数将被调用，并遍历所有具有`Position`组件的实体，更新它们的位置。
 
 需要注意的是，在使用`entt::system`时，还可以通过`entt::sink`类型将多个系统组合在一起，以便在同一帧更新中一起执行。
 
@@ -234,8 +236,6 @@ for (auto entity : registry.view<Tag>()) {
 
 了解更多关于 EnTT 的信息，请参阅其文档和示例（https://skypjack.github.io/entt/index.html）。
 
-
-
 ### 使用 EnTT 的一个完整实例
 
 下面是一个使用 EnTT 的例子，其中我们使用 EnTT 来管理一些物体的位置和速度，并且在更新位置时检测它是否超出界限：
@@ -255,7 +255,7 @@ void update(entt::registry &registry, float dt) {
     registry.view<Position, Velocity>().each([dt](auto entity, Position &pos, Velocity &vel) {
         pos.x += vel.dx * dt;
         pos.y += vel.dy * dt;
-        
+
         // Check bounds
         if (pos.x < 0 || pos.x >= 800 || pos.y < 0 || pos.y >= 600) {
             registry.destroy(entity);
@@ -269,12 +269,12 @@ void update(entt::registry &registry, float dt) {
 ```c++
 int main() {
     entt::registry registry;
-    
+
     // Create entities with Position and Velocity components
     auto entity1 = registry.create();
     registry.emplace<Position>(entity1, 100.f, 100.f);
     registry.emplace<Velocity>(entity1, 50.f, 50.f);
-    
+
     auto entity2 = registry.create();
     registry.emplace<Position>(entity2, 400.f, 400.f);
     registry.emplace<Velocity>(entity2, -100.f, -100.f);
@@ -315,7 +315,7 @@ void update(entt::registry &registry, float dt) {
     registry.view<Position, Velocity>().each([dt](auto entity, Position &pos, Velocity &vel) {
         pos.x += vel.dx * dt;
         pos.y += vel.dy * dt;
-        
+
         // Check bounds
         if (pos.x < 0 || pos.x >= 800 || pos.y < 0 || pos.y >= 600) {
             registry.destroy(entity);
@@ -325,25 +325,24 @@ void update(entt::registry &registry, float dt) {
 
 int main() {
     entt::registry registry;
-    
+
     // Create entities with Position and Velocity components
     auto entity1 = registry.create();
     registry.emplace<Position>(entity1, 100.f, 100.f);
     registry.emplace<Velocity>(entity1, 50.f, 50.f);
-    
+
     auto entity2 = registry.create();
     registry.emplace<Position>(entity2, 400.f, 400.f);
     registry.emplace<Velocity>(entity2, -100.f, -100.f);
-    
+
     // Update entities
     update(registry, 1.f);
-    
+
     // Print entity positions
     registry.view<Position>().each([](auto entity, Position &pos) {
         std::cout << "Entity " << entity << " position: (" << pos.x << ", " << pos.y << ")" << std::endl;
     });
-    
+
     return 0;
 }
 ```
-
