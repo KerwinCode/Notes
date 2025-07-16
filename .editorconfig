@@ -1,0 +1,9 @@
+root = true
+
+[*]                              # 应用于所有文件
+charset = utf-8                  # 统一文件编码为 utf-8
+indent_style = space             # 使用空格进行缩进
+indent_size = 4                  # 缩进大小为 4 个空格
+end_of_line = lf                 # 统一所有文件的行尾符为 LF
+insert_final_newline = true      # 确保文件末尾有一个空行
+trim_trailing_whitespace = true  # 移除行尾多余的空格

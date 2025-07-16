@@ -321,7 +321,7 @@ int main() {
 
 ## Cheat Sheet
 
-```
+```text
 vector, 变长数组，倍增的思想
     size()  返回元素个数
     empty()  返回是否为空

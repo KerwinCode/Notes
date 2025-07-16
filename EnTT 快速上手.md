@@ -2,7 +2,7 @@
 
 EnTT 是一个现代 C++ 实现的 ECS ，它提供了一种轻量级和高效的方式来管理实体和组件。下面是 EnTT 的使用方法：
 
-### 安装
+## 安装
 
 EnTT 可以通过包管理器或从源代码构建来安装。如果使用包管理器，则可以使用以下命令安装 Entt：
 
@@ -234,7 +234,7 @@ for (auto entity : registry.view<Tag>()) {
 }
 ```
 
-了解更多关于 EnTT 的信息，请参阅其文档和示例（https://skypjack.github.io/entt/index.html）。
+了解更多关于 EnTT 的信息，请参阅其文档和示例（<https://skypjack.github.io/entt/index.html>）。
 
 ### 使用 EnTT 的一个完整实例
 

@@ -34,7 +34,7 @@ int main() {
 
 程序执行结果为：
 
-```
+```text
 int n
 int n
 ```
@@ -84,7 +84,7 @@ auto i = 0, *p = &i;    // 正确：i是整数，p是整型指针
 auto sz = 0, pi = 3.14; // 错误：sz和pi的类型不一致
 ```
 
-#### 复合类型、常量和 auto
+### 复合类型、常量和 auto
 
 编译器推断出来的 auto 类型有时候和初始值的类型并不完全一样，编译器会适当地改变结果类型使其更符合初始化规则。
 
@@ -114,8 +114,8 @@ const auto f = ci; // ci的推演类型是int，f是const int
 还可以将引用的类型设为 auto，此时原来的初始化规则仍然适用：
 
 ```c++
-auto &g = ci; 		// g是一个整型常量引用，绑定到ci
-auto &h = 42; 		// 错误：不能为非常量引用绑定字面值
+auto &g = ci;   // g是一个整型常量引用，绑定到ci
+auto &h = 42;   // 错误：不能为非常量引用绑定字面值
 const auto &j = 42; // 正确：可以为常量引用绑定字面值
 ```
 
@@ -124,9 +124,9 @@ const auto &j = 42; // 正确：可以为常量引用绑定字面值
 要在一条语句中定义多个变量，切记，**符号 & 和 \* 只从属于某个声明符，而非基本数据类型的一部分**，因此初始值必须是同一种类型：
 
 ```c++
-auto k = ci, &l = i;	// k是整数，1是整型引用
-auto &m = ci, *p = &ci;	// m是对整型常量的引用，p是指向整型常量的指针
-auto &n = i, *p2 = &ci;	// 错误：i的类型是int而&ci的类型是const int
+auto k = ci, &l = i; // k是整数，1是整型引用
+auto &m = ci, *p = &ci; // m是对整型常量的引用，p是指向整型常量的指针
+auto &n = i, *p2 = &ci; // 错误：i的类型是int而&ci的类型是const int
 ```
 
 ## decltype - 编译期表达式类型推导
@@ -145,7 +145,7 @@ decltype 处理顶层 const 和引用的方式与 auto 有些许不同。**如�
 const int ci = 0, &cj = ci;
 decltype(ci) x = 0; // x的类型是const int
 decltype(cj) y = x; // y的类型是const int&, y绑定到变量x
-decltype(cj) z;		// 错误：z是一个引用，必须初始化
+decltype(cj) z;  // 错误：z是一个引用，必须初始化
 ```
 
 因为 cj 是一个引用，decltype(cj) 的结果就是引用类型，因此作为引用的 z 必须被初始化。
@@ -160,7 +160,7 @@ decltype(cj) z;		// 错误：z是一个引用，必须初始化
 // decltype的结果可以是引用类型
 int i = 42, *p = &i, &r = i;
 decltype(r + 0) b; // 正确：加法的结果是int，因此b是一个（未初始化的）int
-decltype(*p) c;	   // 错误：c是int&，必须初始化
+decltype(*p) c;    // 错误：c是int&，必须初始化
 ```
 
 因为 r 是一个引用，因此的结果是引用类型。如果想让结果类型是 r 所指的类型，可以把 r 作为表达式的一部分，如 r+0，显然这个表达式的结果将是一个具体值而非一个引用。
@@ -236,10 +236,10 @@ decltype(auto) f(Cont&& c, N n)
 **常量表达式(constexpression）是指值不会改变并且在编译过程就能得到计算结果的表达式。**显然，字面值属于常量表达式，用常量表达式初始化的 const 对象也是常量表达式。**一个对象（或表达式）是不是常量表达式由它的数据类型和初始值共同决定**，例如：
 
 ```c++
-const int max_file = 20;			// max_files是常量表达式
-const int limit = max_files + 1;	// limit就是常量表达式
-int staff_size = 27;				// staff_size不是常量表达式
-const int sz = get_size();			// sz不是常量表达式
+const int max_file = 20;   // max_files是常量表达式
+const int limit = max_files + 1; // limit就是常量表达式
+int staff_size = 27;    // staff_size不是常量表达式
+const int sz = get_size();   // sz不是常量表达式
 ```
 
 尽管 staffsize 的初始值是个字面值常量，但由于它的数据类型只是一个普通 int 而非 const int，所以它不属于常量表达式。另一方面，尽管 sz 本身是一个常量，但它的具体值直到运行时才能获取到，所以也不是常量表达式。
@@ -251,9 +251,9 @@ const int sz = get_size();			// sz不是常量表达式
 C++11 新标准规定，允许将变量声明为 constexpr 类型以便由编译器来验证变量的值是否是一个常量表达式。**声明为 constexpr 的变量一定是一个常量，而且必须用常量表达式初始化**：
 
 ```c++
-constexpr int mf = 20; 			// 20是常量表达式
-constexpr int limit = mf + 1;	// mf+1是常量表达式
-constexpr int sz = size();		// 只有当size是一个constexpr函数时,才是一条正确的声明语句
+constexpr int mf = 20;    // 20是常量表达式
+constexpr int limit = mf + 1; // mf+1是常量表达式
+constexpr int sz = size();  // 只有当size是一个constexpr函数时,才是一条正确的声明语句
 ```
 
 尽管不能使用普通函数作为 constexpr 变量的初始值，但是新标准允许定义一种特殊的 constexpr 函数。这种函数应该足够简单以使得编译时就可以计算其结果，这样就能用 constexpr 函数去初始化 constexpr 变量了。
@@ -275,7 +275,7 @@ constexpr int sz = size();		// 只有当size是一个constexpr函数时,才是�
 必须明确一点，在 constexpr 声明中如果定义了一个指针，**限定符 constexpr 仅对指针有效，与指针所指的对象无关**：
 
 ```c++
-const int *p = nullptr; 	// p是一个指向整型常量的指针
+const int *p = nullptr;  // p是一个指向整型常量的指针
 constexpr int *q = nullptr; // q是一个指向整数的常量指针
 ```
 
@@ -284,10 +284,10 @@ p 和 q 的类型相差甚远，p 是一个指向常量的指针，而 q 是一�
 ```c++
 constexpr int *np = nullptr; // np是一个指向整数的常量指针，其值为空
 int j = 0;
-const int i = 42;			 // i的类型是整型常量
+const int i = 42;    // i的类型是整型常量
 // i和j都必须定义在函数体之外
 constexpr const int *p = &i; // p是常量指针．指向整型常量i
-constexpr int *p1 = &j;		 // pl是常量指针，指向整数j
+constexpr int *p1 = &j;   // pl是常量指针，指向整数j
 ```
 
 ### constexpr 函数
@@ -337,20 +337,20 @@ int main()
 
 - 在 C++11 之前，在编译期进行数值计算必须**使用模板元编程**技巧。具体来说我们通常需要定义一个内含编译期常量 value 的类模板（也称作元函数）。这个类模板的定义至少需要分成两部分，分别用于处理一般情况和特殊情况。
 
-  代码示例中 Factorial 元函数的定义分为两部分：
+    代码示例中 Factorial 元函数的定义分为两部分：
 
-  当模板参数大于 0 时，利用公式 N!=N\*(N-1)! 递归调用自身来计算 value 的值。
+    当模板参数大于 0 时，利用公式 N!=N\*(N-1)! 递归调用自身来计算 value 的值。
 
-  当模板参数为 0 时，将 value 设为 1 这个特殊情况下的值。
+    当模板参数为 0 时，将 value 设为 1 这个特殊情况下的值。
 
 - 在 C++11 之后，编译期的数值计算可以通过**使用 constexpr 声明并定义编译期函数**来进行。相对于模板元编程，使用 constexpr 函数更贴近普通的 C++程序，计算过程显得更为直接，意图也更明显。但在 C++11 中 constexpr 函数所受到的限制较多。如 factorial 函数所示，使用 C++11 在编译期计算阶乘仍然需要利用递归技巧。
 
-  > C++11 标准下，constexpr 函数的使用限制：
-  >
-  > 1.  整个函数的函数体中，除了可以包含 using 指令、typedef 语句以及 static_assert 断言外，只能包含一条 return 返回语句。
-  > 2.  该函数必须有返回值，即函数的返回值类型不能是 void。
-  > 3.  函数在使用之前，必须有对应的定义语句。我们知道，函数的使用分为“声明”和“定义”两部分，普通的函数调用只需要提前写好该函数的声明部分即可（函数的定义部分可以放在调用位置之后甚至其它文件中），但常量表达式函数在使用前，必须要有该函数的定义。
-  > 4.  return 返回的表达式必须是常量表达式。
+    > C++11 标准下，constexpr 函数的使用限制：
+    >
+    > 1. 整个函数的函数体中，除了可以包含 using 指令、typedef 语句以及 static_assert 断言外，只能包含一条 return 返回语句。
+    > 2. 该函数必须有返回值，即函数的返回值类型不能是 void。
+    > 3. 函数在使用之前，必须有对应的定义语句。我们知道，函数的使用分为“声明”和“定义”两部分，普通的函数调用只需要提前写好该函数的声明部分即可（函数的定义部分可以放在调用位置之后甚至其它文件中），但常量表达式函数在使用前，必须要有该函数的定义。
+    > 4. return 返回的表达式必须是常量表达式。
 
 - 在 C++14 之后，**逐步解除了对 constexpr 函数的一些限制**。如 factorial2 函数所示，使用 C++14 在编译期计算阶乘只需利用 for 语句进行常规计算即可。
 

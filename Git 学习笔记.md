@@ -12,9 +12,9 @@
 
 安装完成后需要做如下设置：
 
-```
-$ git config --global user.name "Your Name"
-$ git config --global user.email "email@example.com"
+```sh
+git config --global user.name "Your Name"
+git config --global user.email "email@example.com"
 ```
 
 ### 创建版本库

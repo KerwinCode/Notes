@@ -65,7 +65,7 @@ public:
 - Enemy(Position, Sprite, Velocity, Health, AI)
 - Tree(Position, Sprite)
 
-_注：括号前为实体名，括号内为该实体拥有的组件_
+注：括号前为实体名，括号内为该实体拥有的组件
 
 ### 2. 组件
 
@@ -81,7 +81,7 @@ _注：括号前为实体名，括号内为该实体拥有的组件_
 - PlayerComponent()
 - EnemyComponent()
 
-_注：括号前为组件名，括号内为该组件拥有的数据_
+注：括号前为组件名，括号内为该组件拥有的数据
 
 ### 3. 系统
 
@@ -100,7 +100,7 @@ _注：括号前为组件名，括号内为该组件拥有的数据_
 - MoveSystem(Position, Velocity)
 - RenderSystem(Position, Sprite)
 
-_注：括号前为系统名，括号内为该系统关心的组件集合_
+注：括号前为系统名，括号内为该系统关心的组件集合
 
 ## 没有什么是完美的
 
@@ -360,7 +360,7 @@ for (auto entity : registry.view<Tag>()) {
 }
 ```
 
-了解更多关于 EnTT 的信息，请参阅其文档和示例（https://skypjack.github.io/entt/index.html）。
+了解更多关于 EnTT 的信息，请参阅其文档和示例（<https://skypjack.github.io/entt/index.html）。>
 
 ### 使用 EnTT 的一个完整实例
 

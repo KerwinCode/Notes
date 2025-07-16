@@ -4,7 +4,7 @@ CMake 是一种跨平台的构建系统生成器，可以自动生成用于编�
 
 ## 安装 CMake
 
-首先，您需要安装 CMake。可以从 CMake 的官方网站 https://cmake.org/download/ 下载并安装最新版本。
+首先，您需要安装 CMake。可以从 CMake 的官方网站 <https://cmake.org/download/> 下载并安装最新版本。
 
 ## 简单的 CMakeLists.txt 文件
 
@@ -26,32 +26,32 @@ add_executable(myapp main.cpp)
 
 1. 在项目根目录下创建一个 build 文件夹（或者其他名称），并进入该目录：
 
-```bash
-mkdir build
-cd build
-```
+    ```sh
+    mkdir build
+    cd build
+    ```
 
 2. 运行 CMake：
 
-```bash
-cmake ..
-```
+    ```sh
+    cmake ..
+    ```
 
-这会在 build 文件夹中生成 Makefile 或者 IDE 项目文件，具体取决于您的配置。
+    这会在 build 文件夹中生成 Makefile 或者 IDE 项目文件，具体取决于您的配置。
 
 3. 执行 make 命令（或者在 IDE 中编译项目）：
 
-```bash
-make
-```
+    ```sh
+    make
+    ```
 
-这将编译项目并生成可执行文件。
+    这将编译项目并生成可执行文件。
 
 4. 运行可执行文件：
 
-```bash
-./myapp
-```
+    ```sh
+    ./myapp
+    ```
 
 ## 添加头文件和库
 
@@ -59,37 +59,37 @@ make
 
 1. 在 CMakeLists.txt 文件中添加以下行：
 
-```cmake
-find_package(OpenSSL REQUIRED)
-include_directories(${OPENSSL_INCLUDE_DIR})
-target_link_libraries(myapp ${OPENSSL_LIBRARIES})
-```
+    ```cmake
+    find_package(OpenSSL REQUIRED)
+    include_directories(${OPENSSL_INCLUDE_DIR})
+    target_link_libraries(myapp ${OPENSSL_LIBRARIES})
+    ```
 
-这将告诉 CMake 找到 OpenSSL 库并将其链接到 myapp 可执行文件中。
+    这将告诉 CMake 找到 OpenSSL 库并将其链接到 myapp 可执行文件中。
 
 2. 运行 CMake：
 
-```bash
-cmake ..
-```
+    ```sh
+    cmake ..
+    ```
 
 3. 编译项目：
 
-```bash
-make
-```
+    ```sh
+    make
+    ```
 
 ## 文档
 
-CMake 官方文档 https://cmake.org/documentation/
+CMake 官方文档 <https://cmake.org/documentation/>
 
-CMake 中文文档 https://runebook.dev/zh-CN/docs/cmake/-index-CMake
+CMake 中文文档 <https://runebook.dev/zh-CN/docs/cmake/-index-CMake>
 
-Modern CMake 简体中文版 https://modern-cmake-cn.github.io/Modern-CMake-zh_CN/
+Modern CMake 简体中文版 <https://modern-cmake-cn.github.io/Modern-CMake-zh_CN/>
 
-CMake 菜谱（CMake Cookbook 中文版）https://www.bookstack.cn/read/CMake-Cookbook/README.md
+CMake 菜谱（CMake Cookbook 中文版）<https://www.bookstack.cn/read/CMake-Cookbook/README.md>
 
-CMake 实例：CMakeLearn 项目 https://github.com/SuperH-0630/CMakeLearn
+CMake 实例：CMakeLearn 项目 <https://github.com/SuperH-0630/CMakeLearn>
 
 ## 设置编译选项
 

@@ -67,11 +67,11 @@ int main() {
 }
 ```
 
-# 1. 注册表 (registry)
+## 1. 注册表 (registry)
 
 registry 可以存储和管理实体，也可以创建 views 和 groups 以迭代底层 (underlying) 数据结构。
 
-## create() & destroy()
+### create() & destroy()
 
 ```c++
 // 构造一个没有组件的裸实体并返回其标识符
@@ -81,7 +81,7 @@ auto entity = registry.create();
 registry.destroy(entity);
 ```
 
-## view
+### view
 
 ```c++
 // 摧毁范围内的所有实体
@@ -89,7 +89,7 @@ auto view = registry.view<a_component, another_component>();
 registry.destroy(view.begin(), view.end());
 ```
 
-## valid & version & current
+### valid & version & current
 
 ```c++
 // 如果实体仍然有效，则返回 true，否则返回 false
@@ -102,7 +102,7 @@ auto version = registry.version(entity);
 auto curr = registry.current(entity);
 ```
 
-## emplace
+### emplace
 
 ```c++
 // 创建、初始化给定组件并将其分配给实体。如果组件存在，emplace 接受可变数量的参数来构造组件本身
@@ -115,7 +115,7 @@ vel.dx = 0.;
 vel.dy = 0.;
 ```
 
-## insert
+### insert
 
 当类型被指定为模板参数或实例被传递为参数时，立即为所有实体分配相同的组件
 
@@ -129,7 +129,7 @@ registry.insert(from, to, position{0., 0.});
 registry.insert<position>(first, last, instances);
 ```
 
-## patch & replace
+### patch & replace
 
 ```c++
 // 替换原来的组件
@@ -139,14 +139,14 @@ registry.patch<position>(entity, [](auto &pos) { pos.x = pos.y = 0.; });
 registry.replace<position>(entity, 0., 0.);
 ```
 
-## emplace_or_replace
+### emplace_or_replace
 
 ```c++
 // 如过不知道实体是否已经拥有该组件的实例，可以使用该函数
 registry.emplace_or_replace<position>(entity, 0., 0.);
 ```
 
-## has & any
+### has & any
 
 ```c++
 // 如果实体具有给定的所有组件，则为真
@@ -161,21 +161,21 @@ if(registry.has<velocity>(entity)) {
 }
 ```
 
-## remove
+### remove
 
 ```c++
 // 从实体中删除组件
 registry.remove<position>(entity);
 ```
 
-## remove_if_exists
+### remove_if_exists
 
 ```c++
 // 实体有该组件就删除，否则安全返回
 registry.remove_if_exists<position>(entity);
 ```
 
-## clear
+### clear
 
 ```c++
 // 删除拥有给定组件的实体
@@ -185,7 +185,7 @@ registry.clear<position>();
 registry.clear();
 ```
 
-## get
+### get
 
 可以通过以下方式获得对组件的引用
 
@@ -203,7 +203,7 @@ auto [pos, vel] = registry.get<position, velocity>(entity);
 
 Get 提供对存储在 registry 中实体组件的直接访问。还有一个名为 try_get 的成员函数，在指定组件存在时，返回一个指向实体所拥有组件的指针，不存在则返回一个空指针。
 
-## on_construct & on_destroy & on_destroy
+### on_construct & on_destroy & on_destroy
 
 创建对组件的侦听器
 
@@ -241,9 +241,9 @@ void(entt::registry &, entt::entity);
 
 更多相关部分参考 signal 的文档
 
-# 2. 响应式系统 (Reactive System)
+## 2. 响应式系统 (Reactive System)
 
-## observer
+### observer
 
 ```c++
 entt::observer observer{registry, entt::collector.update<sprite>()};
@@ -269,7 +269,7 @@ observer.each([](const auto entity) {
 });
 ```
 
-## collector
+### collector
 
 collector 是一个实用程序，旨在生成一个匹配器列表 (实际规则) ，以便与观察者一起使用。
 
@@ -291,7 +291,7 @@ entt::collector.group<position, velocity>(entt::exclude<destroyed>);
 
 粗略地说，观察匹配器拦截更新了给定组件的实体，而分组匹配器跟踪自上次请求以来已经分配了给定组件的实体。
 
-## where
+### where
 
 使用 where 子句进行筛选
 
@@ -301,7 +301,7 @@ entt::collector.update().where(entt::exclude);
 
 在上面的例子中，当一个实体的精灵组件被更新时，观察者就会对实体进行检测，验证它至少要有位置组件，并且没有速度组件。如果过滤器的两个条件中的一个没有得到遵守，那么这实体就会被筛选掉。
 
-## registry.sort
+### registry.sort
 
 组件可以直接排序：
 
@@ -329,9 +329,9 @@ registry.sort<movement, physics>();
 
 附带说明，组的使用限制了对组件池进行排序的可能性。有关更多详细信息，请参阅特定的文档。
 
-# 3. 辅助工具
+## 3. 辅助工具
 
-## entt::null
+### entt::null
 
 ```c++
 registry.valid(entt::null); // 返回 false
@@ -354,7 +354,7 @@ const bool null = (entity == entt::null);
 
 请注意，`entt::null` 和为 0 的实体不是一回事。同样，初始化为 0 的实体与 `entt::null` 也是不同的。`entt::null{}` 在某种意义上是 0 实体的别名，且它们都不能用于创建空实体。
 
-## entt::to_entity
+### entt::to_entity
 
 它接受 registry 和组件实例，并返回与给定组件相关联的实体：
 
@@ -364,7 +364,7 @@ const auto entity = entt::to_entity(registry, position);
 
 此实用程序不执行任何对组件有效性的检查。因此，尝试获取无效元素或与给定 registry 不关联组件实例的实体可能会导致未定义的行为。
 
-## 依赖关系
+### 依赖关系
 
 当给实体分配 my_type 组件时，添加或替换 a_type 组件：
 
@@ -386,11 +386,11 @@ registry.on_construct<my_type>().disconnect<&entt::registry::<a_type>>();
 
 还有许多其他类型的依赖关系。大多数将实体作为第一个参数的函数，都可以很好的用于此目的。
 
-## 调用 (invoke)
+### 调用 (invoke)
 
 有时能够直接调用组件的成员函数作为回调很有用。在实践中已经可以实现，但是需要用户扩展其类，而这并非总是可能的。
 
-### entt::invoke
+#### entt::invoke
 
 ```c++
 registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
@@ -398,7 +398,7 @@ registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
 
 它所做的就是为接收到的实体选择合适的组件并调用请求的方法，并在必要时传递参数。
 
-## Handle
+### Handle
 
 句柄是围绕实体和注册表的薄包装。它提供了注册表提供的与组件一起使用的函数，例如 Emplace，Get，Patch，Remove 等。区别在于实体是隐式传递给注册表的。
 
@@ -417,7 +417,7 @@ using my_const_handle = entt::basic_handle<const my_identifier>;
 
 句柄主要用于简化函数签名。如果函数需要一个注册表和一个实体，并在该实体上完成其大部分工作，则用户可以考虑使用句柄。
 
-## 上下文变量 (Context variables)
+### 上下文变量 (Context variables)
 
 将上下文变量分配给注册表通常很方便。
 
@@ -439,21 +439,21 @@ registry.unset<my_type>();
 
 上下文变量的类型必须是默认可构造且可以移动的。
 
-### set
+#### set
 
 根据给定类型创建上下文变量。(要么创建上下文变量的新实例，要么覆盖已经存在的实例)
 
-### ctx & try_ctx
+#### ctx & try_ctx
 
 均可用于检索新创建的实例
 
 try_ctx 成员函数返回指向上下文变量的指针，不存在则返回空指针。
 
-### unset
+#### unset
 
 unset 则用于在需要时清除变量
 
-## 组织者 (Organizer)
+### 组织者 (Organizer)
 
 组织者类模板提供最小的支持（但在许多情况下足够），以根据函数及其对资源的要求创建执行图 (execution graph)。
 
@@ -532,9 +532,9 @@ for(auto &&node: graph) {
 
 任务的实际调度是用户的责任，可以使用首选工具 (preferred tool)。
 
-# 4. Meet the runtime
+## 4. Meet the runtime
 
-## visit
+### visit
 
 注册表提供了访问它并获取其管理的组件类型的函数：
 
@@ -554,7 +554,7 @@ registry.visit(entity, [](const auto component) {
 
 这有助于在主要程基于 C++ 类型系统的注册表和其他不能选择编译时的上下文之间建立一个桥梁。例如：插件系统，元系统，序列化等。
 
-## 克隆注册表 (registry)
+### 克隆注册表 (registry)
 
 克隆注册表并不是一种建议的做法，因为它可能会触发许多副本并降低性能。此外，由于注册表类的设计，将其作为内置特性来支持的话，还会对不需要的用户增加编译时间。更糟糕的是，在实际使用时，很难为不同类型定义克隆策略。
 
@@ -606,7 +606,7 @@ from.visit([this, &to](const auto type_id) {
 
 作为附带说明，也可以将克隆函数附加到反射系统，在该反射系统中，使用运行时类型标识符解析元类型。
 
-## Stamping 一个实体
+### Stamping 一个实体
 
 同时使用多个 registry 是很常见的。例如 UI 与模拟的分离，或者在后台加载不同的场景 (可能在单独的线程上)，而不必跟踪哪个实体属于哪个场景。
 
@@ -654,7 +654,7 @@ from.visit(src, [this, &to, dst](const auto type_id) {
 
 如果需要，还可以很容易地通过这种方式为特殊类型定义定制 Stamping 函数。此外，在实践中，在具有不同标识符的注册表间对实体进行 Stamping 在实践中也是可行的。
 
-## 快照 (Snapshot): complete 和 continuous
+### 快照 (Snapshot): complete 和 continuous
 
 注册表类提供了对序列化的基本支持。
 
@@ -694,7 +694,7 @@ entt::snapshot{registry}.component<a_component, another_component>(output, view.
 
 这个版本可以在不调用 entities 成员函数的情况下正常工作。
 
-## 快照加载器 (Snapshot loader)
+### 快照加载器 (Snapshot loader)
 
 创建快照后，主要有两种方法加载快照：整体加载、连续加载。
 
@@ -716,29 +716,29 @@ loader.entities(input)
 
 不必每次都调用所有函数。要使用什么函数主要取决于需求。但要注意，还原数据的顺序要与序列化时的顺序对应。
 
-### .entities
+#### .entities
 
 还原实体组，并在需要时将每个实体映射到本地副本。换句话说，对于每个尚未注册到加载器的远程实体标识符，会创建一个本地标识符，以便使本地实体与远程实体保持同步。
 
-### .component
+#### .component
 
 仅还原指定组件，并将它们分配给对应实体。
 
 如果组件本身包含实体（作为 `entt::entity` 类型的数据成员或作为实体的容器），则加载器可以自动更新它们。为此，只需如示例所示指定要更新的数据成员即可。
 
-### .orphans
+#### .orphans
 
 会在恢复后销毁那些没有组件的实体。它具有与前一节中描述的完全相同的目的，并以相同的方式工作。
 
-### .shrink
+#### .shrink
 
 帮助清除不再具有远程连接的本地实体。用户应该在每个快照都恢复后调用这个成员函数，除非他们确切地知道自己在做什么。
 
-## 档案 (Archives)
+### 档案 (Archives)
 
 档案必须暴露一组预定义的成员函数。这个 API 很简单，只是一组由快照类和加载器调用的函数调用运算符组成。
 
-### 输出档案
+#### 输出档案
 
 创建快照时使用的档案，必须暴露具有以下签名的函数调用运算符以存储实体：
 
@@ -762,7 +762,7 @@ void operator()(entt::entity, const T &);```
 
 如何序列化数据由输出档案自己自由决定，注册表不受其影响。
 
-### 输入档案
+#### 输入档案
 
 还原快照时使用的档案，必须暴露具有以下签名的函数调用运算符以加载实体：
 
@@ -786,7 +786,7 @@ void operator()(entt::entity &, T &);
 
 每次调用此类运算符时，档案都必须从基础存储中读取下一个元素，并将其复制到给定的变量中。
 
-### 示例
+#### 示例
 
 EnTT 附带了一些示例（实际上是一些测试），这些示例显示了如何将众所周知的库进行序列化以集成为存档。在后台使用 [Cereal C ++](https://uscilab.github.io/cereal/)，主要是因为我想在编写代码时学习它的工作原理。
 
@@ -794,7 +794,7 @@ EnTT 附带了一些示例（实际上是一些测试），这些示例显示了
 
 基本思路是将所有内容存储在内存中的一组队列中，然后使用不同的加载器将所有内容带回到注册表中。
 
-# 5. 视图 (Views) 和组 (Groups)
+## 5. 视图 (Views) 和组 (Groups)
 
 视图和组是执行单一职责的好工具。有权访问注册表的系统可以创建和销毁实体，以及分配和删除组件。而有权访问视图或组的系统只能迭代、读取、更新实体和组件。
 
@@ -813,7 +813,7 @@ EnTT 附带了一些示例（实际上是一些测试），这些示例显示了
 
 一个给定的组件只有在它们是嵌套的时候才能属于多个组，因此用户必须仔细定义组，才能充分利用它们。
 
-## 视图 (Views)
+### 视图 (Views)
 
 构造视图时，是为单个组件，还是为迭代多个组件，会导致视图行为有所不同。甚至这两种情况下，API 也会略有不同。
 
@@ -892,7 +892,7 @@ for(auto entity: view) {
 
 注意：在迭代期间，最好使用视图的 get 成员函数，而不是注册表的 get 成员函数，以便获取视图本身迭代的类型。
 
-### 视图包 (View pack)
+#### 视图包 (View pack)
 
 视图包允许用户将多个视图组合成一个类似于视图的可迭代对象，同时还使他们可以完全控制哪个视图应该导致迭代。
 
@@ -941,7 +941,7 @@ for(auto [entt, pos, vel]: pack.each()) {
 
 另请阅读 dedicated 部分，以了解在自定义存储和池的创建和使用中如何使用视图包。
 
-## 运行时视图 (Runtime views)
+### 运行时视图 (Runtime views)
 
 运行时视图会迭代它的包中所包含的所有给定组件的实体。在构建期间，这些视图查看每个组件可获得 (available) 实体的数量，并选择对最小候选集的引用，以加快迭代速度。
 
@@ -982,7 +982,7 @@ auto view = registry.runtime_view(std::cbegin(components), std::cend(components)
 
 注意：运行时视图适用于用户在编译时不知道要使用哪些组件迭代实体的情况。如果可能的话，请尽量不要使用运行时视图，因为它们的性能不如其他视图。
 
-## 组 (Groups)
+### 组 (Groups)
 
 组旨在一次迭代多个组件，并为多组件视图提供更快的替代方法。
 
@@ -1038,7 +1038,7 @@ for(auto &&[entity, pos, vel]: registry.group<position>(entt::get<velocity>).eac
 
 注意：在迭代过程中，最好不要使用注册表的 get 成员函数，而是使用组的 get 成员函数来获取由组本身迭代的类型。
 
-### Full-owning groups
+#### Full-owning groups
 
 完全拥有组是用户一次迭代多个组件的最快工具。它直接迭代所有组件，而无需间接调用。这种类型的组或多或少地表现得好似用户正在依次访问一堆打包的组件数组，这些组件的排序完全相同，没有跳转或分支。
 
@@ -1056,7 +1056,7 @@ auto group = registry.group<position, velocity>(entt::exclude<renderable>);
 
 创建后，组将获得模板参数列表中指定的所有组件的所有权，并根据需要排列其池。创建组后，将不再允许对拥有的组件进行排序。但是，完全拥有组可以通过其 sort 成员函数进行分类。对完全拥有组进行排序会影响其所有实例。
 
-### Partial-owning groups
+#### Partial-owning groups
 
 对于拥有组，部分拥有组的工作方式与完全拥有组类似，但是依赖于间接获取其他组拥有的组件。这不像完全拥有组那么快，但是当只有一个或两个可用组件需要检索时 (最常见的情况) ，它已经比视图快得多。在最坏的情况下，它也不会比视图慢。
 
@@ -1076,7 +1076,7 @@ auto group = registry.group<position>(entt::get<velocity>, entt::exclude<rendera
 
 创建组后，将不再允许对拥有的组件进行排序。但是，部分拥有组可以通过其 sort 成员函数进行分类 对部分拥有组进行排序会影响其所有实例。
 
-### Non-owning groups
+#### Non-owning groups
 
 非拥有组通常足够快，可以肯定比视图快，并且适合大多数情况。但是，它们需要自定义数据结构才能正常工作，并且会增加内存消耗。根据经验，如果可能，用户应避免使用非拥有组。
 
@@ -1096,7 +1096,7 @@ auto group = registry.group<>(entt::get<position, velocity>, entt::exclude<rende
 
 非拥有组可以通过其 sort 成员函数进行分类。对非拥有组进行排序会影响其所有实例。
 
-### 嵌套组 (Nested groups)
+#### 嵌套组 (Nested groups)
 
 一种组件类型不能被两个或多个冲突 (conflicting) 组所拥有，例如：
 
@@ -1151,7 +1151,7 @@ auto group = registry.group<>(entt::get<position, velocity>, entt::exclude<rende
 
 但是，给定一个嵌套组的族，仍然可以对限制性最强的组进行排序。为了避免用户必须记住其组中限制最大的组，注册表类提供了 sortable 成员函数，用来确定是否可以对组进行排序。
 
-## 类型：const 和 non-const 及两者之间的类型
+### 类型：const 和 non-const 及两者之间的类型
 
 在构造视图和组时，注册表类提供了两个重载：const 版本和非 const 版本。前者仅接受 const 类型作为模板参数，后者则接受 const 和非 const 类型。
 
@@ -1199,7 +1199,7 @@ view.each([](auto entity, position &pos, const velocity &vel) {
 
 相同的概念也适用于组。
 
-## Give me everything
+### Give me everything
 
 视图和组是整个实体列表上的小窗口。根据其组件过滤实体来工作。
 
@@ -1233,7 +1233,7 @@ registry.orphans([](auto entity) {
 
 由于对每个实体执行某些检查，因此每个处理速度都很慢。类似的原因，orphans 的速度甚至会更慢。请勿经常使用这两个函数，以免造成性能下降的风险。
 
-## 什么允许什么不允许
+### 什么允许什么不允许
 
 现有的大多数 ECS 不允许在迭代过程中创建销毁实体和组件。
 
@@ -1264,7 +1264,7 @@ Each 函数不会中断 (因为迭代器不会失效) ，但是对引用没有�
 
 此功能的显着副作用是，在大多数情况下，所需分配的数量会进一步减少。
 
-### 更好的性能，更多的约束
+#### 更好的性能，更多的约束
 
 组是视图的（快得多）替代方法。但是，性能越高，对允许和不允许的条件的约束就越大。
 
@@ -1283,7 +1283,7 @@ Each 函数不会中断 (因为迭代器不会失效) ，但是对引用没有�
 
 这是因为组拥有其组件池，并在内部组织数据以最大限度地提高性能。因此，只有在将拥有的组件作为其组的一部分或作为具有多个组件视图和组的自由类型进行迭代时，才可以保证所拥有组件的完全一致性。
 
-# 6. 空类型优化
+## 6. 空类型优化
 
 空类型 T 使得 `std::is_empty_v<T>` 返回 true。它们也是可以进行空基优化（EBO）的类型。
 
@@ -1305,7 +1305,7 @@ registry.sort<empty_type>([](const entt::entity lhs, const entt::entity rhs) {
 
 可以通过定义 ENTT_NO_ETO 宏来禁用此优化。在这种情况下，无论如何，空类型都将像其他所有类型一样对待。
 
-# 7. 多线程
+## 7. 多线程
 
 通常，整个注册表不是线程安全的。出于多种原因，线程安全并不是用户需要的。例如为了性能。
 
@@ -1322,7 +1322,7 @@ registry.sort<empty_type>([](const entt::entity lhs, const entt::entity rhs) {
 
 有关更多信息，请参见相关文档。
 
-## 迭代器
+### 迭代器
 
 对于视图和组返回的迭代器，需要特别提及。在大多数情况下，它们满足随机访问迭代器的要求，在所有情况下，它们至少满足双向迭代器的要求。
 
