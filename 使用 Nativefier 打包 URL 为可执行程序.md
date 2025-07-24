@@ -176,7 +176,7 @@ contextBridge.exposeInMainWorld("myAPI", {
 使用以下命令即可实现生成 URL 可动态配置的应用（**在`cmd`中执行**）：
 
 ```cmd
-nativefier "D:/warpper/index.html" --name "App" --icon "D:/warpper/favicon.ico" --inject "D:/warpper/preload.js" --browserwindow-options "{\"webPreferences\":{\"contextIsolation\":true}}" --internal-urls ".*"
+nativefier "file:./index.html" --name "App" --icon "favicon.ico" --inject "./preload.js" --browserwindow-options "{\"webPreferences\":{\"contextIsolation\":true}}" --internal-urls ".*"
 ```
 
 这条命令：
@@ -188,14 +188,14 @@ nativefier "D:/warpper/index.html" --name "App" --icon "D:/warpper/favicon.ico" 
 
 具体地：
 
-- `nativefier "D:/warpper/index.html"`
-    这是命令的核心目标。它告诉 Nativefier，你要封装的不是一个在线的 URL ，而是一个本地的 HTML 文件。这是实现“通过配置文件动态跳转”方案的关键第一步。我们不直接打包最终的目标网址，而是打包一个本地的“启动器”页面。这个启动器页面再通过 JavaScript 去读取配置并执行跳转。**实测这里一定要使用绝对路径** `D:/warpper/index.html`。
+- `nativefier "file:./index.html"`
+    这是命令的核心目标。它告诉 Nativefier，你要封装的不是一个在线的 URL ，而是一个本地的 HTML 文件。这是实现“通过配置文件动态跳转”方案的关键第一步。我们不直接打包最终的目标网址，而是打包一个本地的“启动器”页面。这个启动器页面再通过 JavaScript 去读取配置并执行跳转。`file:./index.html`指定协议为本地文件，并使用相对路径。
 
-- `--name "App"` 和 `--icon "D:/warpper/favicon.ico"`
+- `--name "App"` 和 `--icon "favicon.ico"`
 
     这两个选项分别设置了应用的名称和图标。
 
-- `--inject "D:/warpper/preload.js"`
+- `--inject "./preload.js"`
 
     将指定的 `preload.js` 脚本注入到应用中。这是解决“本地文件跨域读取 `config.json`”问题的**正确且安全**的方案。这个 `preload` 脚本运行在一个有特权的环境里，它可以使用 Node.js 的 `fs`模块来读取本地的 `config.json`，然后通过 `contextBridge` 安全地将配置信息暴露给 `index.html` 页面。
 
