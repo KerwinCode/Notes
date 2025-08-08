@@ -20,7 +20,7 @@ Visual Studio 2022
 
 开启 Command Prompt，将 directory 移至该目录，依序输入命令
 
-```sh
+```cmd
 .\vcvarsall.bat x64
 
 SET PATH=%PATH%;C:\IronTcl\bin
@@ -30,7 +30,7 @@ SET PLATFORM=x64
 
 将 directory 移至 sqlcipher 的代码目录后创建”BUILD”目录，再 change directory 到里面
 
-```sh
+```cmd
 mkdir BUILD
 
 cd BUILD
@@ -75,7 +75,7 @@ LTLIBS = $(LTLIBS) libcrypto.lib libssl.lib ws2_32.lib shell32.lib advapi32.lib 
 
 修改完后保存，离开，回到 Command Prompt，输入以下指令。
 
-```sh
+```cmd
 nmake /f C:\sqlcipher-4.6.1\Makefile.msc TOP=C:\sqlcipher-4.6.1
 ```
 
@@ -97,7 +97,7 @@ nmake /f C:\sqlcipher-4.6.1\Makefile.msc TOP=C:\sqlcipher-4.6.1
 
 在 BUILD 文件夹里执行 sqlcipher CLI，输入以下指令即可。
 
-```sh
+```cmd
 .\sqlite3.exe
 ```
 
@@ -117,13 +117,13 @@ WSL2(Ubuntu 22.04.4 LTS)
 
 [SQLCipher Source Code](https://github.com/sqlcipher/sqlcipher/releases)
 
-```sh
+```bash
 sudo apt-get install build-essential openssl libssl-dev tcl
 ```
 
 ### 编译过程
 
-```sh
+```bash
 ./configure --enable-tempstore=yes CFLAGS="-fPIC -DSQLITE_HAS_CODEC -DSQLITE_ENABLE_COLUMN_METADATA" LDFLAGS="/usr/lib/x86_64-linux-gnu/libcrypto.a"
 
 make
@@ -145,7 +145,7 @@ make install
 
 将在 Windows 上和 Linux 上编译生成的库文件拷贝到 SQLiteCpp 源码目录下的 sqlcipher 目录中
 
-```sh
+```bash
 sqlcipher
 ├── libcrypto-3-x64.dll
 ├── libsqlcipher.a
@@ -200,7 +200,7 @@ endif()
 
 **以下所有的`sqlcipher` 命令可用集成 SQLCipher 的`sqlite3`替代**
 
-```sh
+```bash
 sqlcipher encrypted.db
 PRAGMA key = 'xxxxxx';  # 替换为你的密钥
 .read your_script.sql  # 导入 SQL 文件
@@ -218,7 +218,7 @@ SQLCipher 要求 `PRAGMA key` 必须在连接数据库后**立即执行**，且�
 
     在终端中执行以下命令：
 
-    ```sh
+    ```bash
     sqlcipher encrypted.db  # 打开新加密数据库
     PRAGMA key = 'your_encryption_key';  # 设置加密密钥
     PRAGMA cipher_page_size = 4096;      # 可选，需与需求一致
@@ -237,7 +237,7 @@ SQLCipher 要求 `PRAGMA key` 必须在连接数据库后**立即执行**，且�
 
     重新打开加密数据库，检查数据完整性：
 
-    ```sh
+    ```bash
     sqlcipher encrypted.db
     PRAGMA key = 'your_encryption_key';
     .tables  # 查看表是否存在
@@ -250,7 +250,7 @@ SQLCipher 要求 `PRAGMA key` 必须在连接数据库后**立即执行**，且�
 
     使用 `sqlite3` 导出原始数据库：
 
-    ```sh
+    ```bash
     sqlite3 plaintext.db .schema > backup.sql  # 导出结构
     sqlite3 plaintext.db .dump >> backup.sql   # 导出数据
     ```
@@ -259,8 +259,42 @@ SQLCipher 要求 `PRAGMA key` 必须在连接数据库后**立即执行**，且�
 
     通过 SQLCipher 导入：
 
-    ```sh
+    ```bash
     sqlcipher encrypted.db
     PRAGMA key = 'your_encryption_key';
     .read backup.sql  # 导入 SQL 文件
     ```
+
+## 补充：SQLite 的其他加密封装版本 - SQLite3MultipleCiphers
+
+[SQLite3MultipleCiphers](https://github.com/utelle/SQLite3MultipleCiphers) 是一个支持多种密码的 SQLite3 加密扩展版本，是从 wxSQLite3 中分离出来的一个独立版本。并且提供编译好的 Windows 版本，免去了上述的编译步骤，使用也极为方便。
+
+```cpp
+#include <sqlite3.h>
+#include <sqlite3mc.h>
+
+int main() {
+    sqlite3* db;
+    sqlite3_open("test.db", &db);
+    sqlite3_key(db, "123456", 6);
+    sqlite3_exec(db, "create table person (id int,name varchar(50))", nullptr, nullptr, nullptr);
+    sqlite3_exec(db, "insert into person (id,name) values (1,'张三')", nullptr, nullptr, nullptr);
+    sqlite3_close(db);
+```
+
+```cmake
+cmake_minimum_required(VERSION 3.0)
+project(test VERSION 1.0)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE}/bin)
+set(SQLite3MC_DIR "D:/App/sqlite3mc-2.1.1-sqlite-3.49.2-icu-win64")
+include_directories(${SQLite3MC_DIR}/include)
+add_executable(${PROJECT_NAME} main.cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${SQLite3MC_DIR}/dll/sqlite3mc_icu_x64.lib)
+```
+
+通过以上示例，就可以在 C++ 中使用 SQLite3MultipleCiphers 进行加密数据库的操作。
+
+另外，再推荐一款免费、开源且跨平台的 SQLite 的图形化管理工具 [SQLiteStudio](https://sqlitestudio.pl/)，它也支持加密数据库的管理，使用起来非常方便。
+
+可参考 [C++使用加密sqlite3数据库](https://www.bilibili.com/video/BV18GjbzREDy)，有详细讲解和说明。
