@@ -5,7 +5,7 @@
 1. OpenDDS-3.31.0.tar.gz
 2. rapidjson-src（cmake 会自动拉取，位置在`build/_deps/rapidjson-src`，可拷贝到根目录）
 3. ACE+TAO-src-7.1.3.tar.bz2
-4. ACE+TAO-src-7.1.3.zip（cmake 会自动拉取，这两个文件位置在`build/_deps/ace_tao_dl-tmp`，可拷贝到其他目录，或者更推荐配置到本地 http 服务器上）
+4. ACE+TAO-src-7.1.3.zip（cmake 会自动拉取，这两个文件位置在`build/_deps/ace_tao_dl-tmp`，可拷贝到源码目录下）
 
 ## 离线编译步骤
 
@@ -32,7 +32,7 @@
 
 3. `ACE+TAO`依赖处理
 
-    修改源码根目录下的`acetao.ini`，30 行 和 36 行，改为本地路径或本地服务器地址
+    修改源码根目录下的`acetao.ini`，30 行 和 36 行，改为本地路径，压缩包可放在源码根目录下（和`acetao.ini`同一目录，在`acetao.ini`中直接填文件名即可）
 
 4. `ACE+TAO`编译时添加`-fPIC`
 
