@@ -4,7 +4,7 @@
 
 可使用使用 apt-get 或 apt 命令来安装 Trash-Cli：
 
-```sh
+```bash
 sudo apt install trash-cli
 ```
 
@@ -12,7 +12,7 @@ sudo apt install trash-cli
 
 Trash-Cli 提供了下面这些命令：
 
-```sh
+```bash
 trash-put： 删除文件和目录（仅放入回收站中）
 trash-list ：列出被删除了的文件和目录
 trash-restore：从回收站中恢复文件或目录 trash.
@@ -22,7 +22,7 @@ trash-empty：清空回收站
 
 删除超过 X 天的垃圾文件：
 
-```sh
+```bash
 # 删除回收站中超过 30 天的文件
 $ trash-empty 30
 ```
@@ -34,7 +34,7 @@ $ trash-empty 30
 
 创建一个别名（alias），在你的 shell 配置文件（通常是.bashrc、.bash_profile、.zshrc）中添加以下内容：
 
-```sh
+```bash
 alias proxy-on='export http_proxy=http://proxyAddress:port; export https_proxy=http://proxyAddress:port'
 alias proxy-off='unset http_proxy; unset https_proxy'
 # 注: proxyAddress 需要替换为代理服务器IP, port 为服务端口
@@ -42,7 +42,7 @@ alias proxy-off='unset http_proxy; unset https_proxy'
 
 应用配置
 
-```sh
+```bash
 source ~/.zshrc 或 source ~/.bash_profile
 ```
 
@@ -54,14 +54,14 @@ source ~/.zshrc 或 source ~/.bash_profile
 
 ## 复制依赖库
 
-```sh
+```bash
 mkdir lib64
 ldd xxx | awk '{print $3}' | xargs -i cp -L {} ./lib64/
 ```
 
 ## 查看目录/文件大小 - `du`
 
-```sh
+```bash
 # 显示目录/文件总大小
 du -sh /path/to/directory
 # -s仅显示总大小，不列出子目录细节
@@ -88,7 +88,7 @@ df -h /path/to/directory  # 显示目录所在分区的总/已用/剩余空间
 
 如果我们想要查找一些可以在终端直接使用的程序的路径，比如 `gcc`、`cmake`、`git` 这种，我们可以使用 `which` 命令查看，通常都是在 `/usr/bin/`：
 
-```sh
+```bash
 which cmake
 /usr/bin/cmake
 ```
@@ -112,7 +112,7 @@ D:\CLion 2023.1.4\bin\cmake\win\x64\bin\cmake.exe
 
 `apt` 是一个用于 Debian 和 Ubuntu 系列 Linux 发行版的包管理工具。它提供了简单的方法来安装、更新和删除软件包。基本用法包括：
 
-```shell
+```bash
 sudo apt update              # 更新软件包列表
 sudo apt install [package]   # 安装指定的软件包
 sudo apt remove [package]    # 卸载指定的软件包
@@ -120,7 +120,7 @@ sudo apt remove [package]    # 卸载指定的软件包
 
 安装的库通常位于 `/usr/lib/x86_64-linux-gnu`，头文件位于 `/usr/include`。使用以下命令可以查看某个包的安装位置：
 
-```shell
+```bash
 dpkg -L [package]
 ```
 

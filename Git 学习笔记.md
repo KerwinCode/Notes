@@ -12,7 +12,7 @@
 
 安装完成后需要做如下设置：
 
-```sh
+```bash
 git config --global user.name "Your Name"
 git config --global user.email "email@example.com"
 ```

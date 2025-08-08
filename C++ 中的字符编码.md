@@ -104,7 +104,7 @@ GB18030：GB18030 是在 GBK 的基础上进一步扩展的编码标准，于 20
 
 那么如何解决这个问题呢？很简单，我们指明它的**源字符集**为 GB18030 不就是了？
 
-```sh
+```bash
 g++ .\test.cpp -o test -finput-charset=gb18030
 ```
 
@@ -112,7 +112,7 @@ g++ .\test.cpp -o test -finput-charset=gb18030
 
 其实大家还需要考虑终端的编码，即使程序完全正确，终端的编码不对依然可能有乱码，这就是环境问题，而非程序本身了。另外，如果想要显式指明执行字符集，可以使用选项：`-fexec-charset`，也就是：
 
-```sh
+```bash
 g++ .\test.cpp -o test -finput-charset=gb18030 -fexec-charset=utf-8
 ```
 

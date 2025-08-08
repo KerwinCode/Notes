@@ -4,7 +4,7 @@
 
 `make` 是一个自动化构建工具，通常与 Makefile 配合使用。Makefile 中定义了如何编译和链接程序的规则。通过运行 make 命令，make 命令会读取 Makefile，自动执行编译和链接的步骤。基本用法如下：
 
-```shell
+```bash
 make              # 根据当前目录下的 Makefile 编译项目
 make clean        # 清理编译生成的文件
 make install      # 安装编译好的程序或库
@@ -36,7 +36,7 @@ NMake（Microsoft Program Maintenance Utility）是微软开发的命令行构�
 
 通常的操作步骤如下：
 
-```shell
+```bash
 mkdir build       # 创建构建目录
 cd build          # 进入构建目录
 qmake ..          # 生成 Makefile
@@ -132,7 +132,7 @@ Hello msbuild!
 
 `CMake` 是一个跨平台的自动化构建系统，它使用 `CMakeLists.txt` 文件来定义构建过程。CMake 可以生成 Makefile、msbuild、ninja 等各种其他构建系统所需的文件。基本用法如下：
 
-```shell
+```bash
 mkdir build                # 创建构建目录
 cd build                   # 进入构建目录
 cmake ..                   # 配置项目，生成构建文件（Linux 下通常为 makefile，Windows 下通常为 msbuild）
@@ -142,7 +142,7 @@ cmake --install .          # 安装编译好的程序或库
 
 使用 Makefile 的流程通常是：
 
-```shell
+```bash
 mkdir build                # 创建构建目录
 cd build                   # 进入构建目录
 cmake ..                   # 生成 Makefile（只当 cmake 是生成 makefile 的工具）
@@ -164,7 +164,7 @@ make install               # 安装编译好的程序或库
 
 假设你已经配置好 `spdlog` 并放入到查找目录，可以直接：
 
-```shell
+```bash
 g++ -o my_logger my_logger.cpp -lspdlog
 ```
 
@@ -198,7 +198,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
 
 这实际很简单：
 
-```shell
+```bash
 git clone https://github.com/gabime/spdlog.git
 cd spdlog
 mkdir build
@@ -210,14 +210,14 @@ cmake --install .
 
 > 默认构建为 Debug 产物，如果需要 Release，则在 build 改成：
 >
-> ```shell
+> ```bash
 > cmake --build . --config Release --parallel
 > ```
 >
 > 如果是 windows，执行 install 会要求你有 Release 和 Debug 两个版本，Linux 系统无此问题。
 > 某些库的 install 默认并不会安装 Debug 版本，那就只能显式：
 >
-> ```shell
+> ```bash
 > cmkae --install . --config Debug
 > ```
 
@@ -295,7 +295,7 @@ int main() {
 
 编译构建：
 
-```shell
+```bash
 cmake .
 cmake --build.
 ```
@@ -356,7 +356,7 @@ d-----         2024/11/1     18:30                spdlog
 
 我们还是以 spdlog 项目的构建为例，我们可以使用 `-G` 选项指明生成 Ninja 文件：
 
-```shell
+```bash
 PS D:\project\spdlog\build> cmake .. -G Ninja
 -- The CXX compiler identification is Clang 18.1.3 with GNU-like command-line
 -- Detecting CXX compiler ABI info
@@ -384,7 +384,7 @@ PS D:\project\spdlog\build> cmake .. -G Ninja
 
 我们可以选择直接输入 Ninja 进行编译构建，如同 Linux 平台 `cmake ..` 后直接 `make` 一样。
 
-```shell
+```bash
 PS D:\project\spdlog\build> Ninja
 [10/10] Linking CXX executable example\example.exe
 ```
@@ -393,7 +393,7 @@ PS D:\project\spdlog\build> Ninja
 
 > Ninja 本身无法直接选择 Debug 或 Release 构建类型，因为它是一个低级别的构建执行工具
 
-```shell
+```bash
 cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
 ```
 
@@ -401,7 +401,7 @@ cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
 
 不过显然我们无需这样做，我们最好的做法是直接：
 
-```shell
+```bash
 cmake .. -G "Ninja Multi-Config"
 cmake --build . --config Debug --parallel
 cmake --build . --config Release --parallel
