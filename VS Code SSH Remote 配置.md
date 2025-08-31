@@ -2,7 +2,37 @@
 
 ## 系统环境
 
-Win11 23H2 + 银河麒麟 SP1 Vmware 虚拟机
+Win11 23H2 + 银河麒麟 V10 SP1 Vmware 虚拟机
+
+需要提前安装 OpenSSH 服务端，用于提供 SSH 服务端守护进程 `sshd`，监听连接请求：
+
+```bash
+sudo apt update
+sudo apt install openssh-server
+```
+
+建议提前配置好静态IP：
+
+```bash
+ifconfig
+ens33: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.171.171  netmask 255.255.255.0  broadcast 192.168.171.255
+        inet6 fe80::3c45:ab16:8302:592f  prefixlen 64  scopeid 0x20<link>
+        ether 00:0c:29:e1:91:d8  txqueuelen 1000  (以太网)
+        RX packets 3538  bytes 3403836 (3.4 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 2668  bytes 293887 (293.8 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+route -n
+内核 IP 路由表
+目标            网关            子网掩码        标志  跃点   引用  使用 接口
+0.0.0.0         192.168.171.2   0.0.0.0         UG    100    0        0 ens33
+169.254.0.0     0.0.0.0         255.255.0.0     U     1000   0        0 ens33
+192.168.171.0   0.0.0.0         255.255.255.0   U     100    0        0 ens33
+```
+
+可参照上述命令结果填写网络配置，静态 IP 填写 192.168.171.171（或同网段其他IP），子网掩码填 255.255.255.0，默认网关填 192.168.171.2，DNS 添加  114.114.114.114（中国电信DNS） 和 8.8.8.8（Google DNS）。
 
 ## 连接配置
 
@@ -33,9 +63,10 @@ Mar 28 16:25:15 dev-pc sshd[6485]: pam_unix(sshd:session): session closed for us
 
 ```bash
 sudo vim /etc/ssh/sshd_config
+
 # 编辑设置：
-# AllowTcpForwarding yes
-# PermitOpen any
+AllowTcpForwarding yes
+PermitOpen any
 
 sudo systemctl restart sshd
 ```
@@ -65,3 +96,7 @@ sudo systemctl restart sshd
 打开你的 SSH 客户端（本机）配置文件（也就是前面生成的 config 文件，一般在 C:\Users\YourUsername\\.ssh\config），添加配置（IdentityFile 私钥文件路径），以指定使用哪个私钥文件。
 
 参考：<https://zhuanlan.zhihu.com/p/667236864>
+
+## 其他注意事项
+
+不同主机复用同一 IP 时，需要在 Windows 系统中涉及清理 `known_hosts`文件（存储已连接服务器的公钥记录）。
