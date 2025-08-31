@@ -192,8 +192,9 @@ if(MSVC)
     add_compile_options(/source-charset:utf-8)
     add_compile_options(/execution-charset:utf-8)
 endif()
-# 或者
-target_compile_options(MyTarget PRIVATE $<$<C_COMPILER_ID:MSVC>:/utf-8>)
+# 或者（更推荐使用生成器表达式，在构建生成阶段动态注入选项，精准匹配编译器且抗覆盖）
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
+target_compile_options(MyTarget PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
 ```
 
 还需要作以下设置，示例如下：
@@ -202,7 +203,7 @@ target_compile_options(MyTarget PRIVATE $<$<C_COMPILER_ID:MSVC>:/utf-8>)
 #include <iostream>
 
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 #include <codecvt>
 #endif
 
