@@ -62,7 +62,7 @@ vcpkg install
 # 方法1：命令行传递​：
 cmake -B build -DCMAKE_TOOLCHAIN_FILE=C:/Apps/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-# 方法2：在 CMakeLists.txt 中设置（需在 project() 前）​​：
+# 方法2：在 CMakeLists.txt 中设置（需在 project() 前）：
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 
 # 方法3：修改 CMakePresets.json, 在 cacheVariables 中添加（实测使用全局安装的库时失效）：
