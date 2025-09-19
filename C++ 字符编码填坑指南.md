@@ -1,4 +1,4 @@
-# C++ 中的字符编码
+# C++ 字符编码填坑指南
 
 ## 字符集与字符编码
 
@@ -136,7 +136,7 @@ Visual Studio 2015 Update 2 及之后版本分别用 [`/source-charset`](https:/
 
 C++20 显著增强了对 UTF-8 的原生支持，核心改进围绕**类型安全**、**专用容器**和**跨平台一致性**展开，解决了早期版本中的编码混淆问题。
 
-### 1. `char8_t` 类型
+### `char8_t` 类型
 
 - **作用**：明确标识 UTF-8 编码的字符，本质是无符号 8 位整数 (`unsigned char`)，但编译器赋予其语义标签。
 - **类型安全**：严格区分 UTF-8 字符串与其他编码（如 ASCII 或本地编码），避免误用：
@@ -153,7 +153,7 @@ C++20 显著增强了对 UTF-8 的原生支持，核心改进围绕**类型安�
     std::u8string new_str = reinterpret_cast<const char8_t*>(legacy_str);  // 需确保原字符串是 UTF-8
     ```
 
-### 2. `std::u8string` 容器
+### `std::u8string` 容器
 
 - **专用容器**：基于 `char8_t` 的字符串类，提供与 `std::string` 相同的接口（如 `append()`, `find()`）。
 
@@ -171,7 +171,7 @@ C++20 显著增强了对 UTF-8 的原生支持，核心改进围绕**类型安�
 
 `std::u8string::size()` 返回的也是字节数而非字符数，需用第三方库（如 ICU）计算字符数
 
-### 3. `u8` 前缀行为变化
+### `u8` 前缀行为变化
 
 - **C++17**：`u8"文本"` 返回 `const char[]`，易与其他编码混淆。
 - **C++20**：`u8"文本"` 返回 `const char8_t[]`，编译器强制类型检查。
@@ -293,6 +293,176 @@ echo "* text=auto" > .gitattributes
 ```
 
 这段配置脚本，其核心目标是**统一 Git 项目的字符编码为 UTF-8，并规范换行符的处理**，从而有效避免跨平台协作时可能出现的乱码和换行符冲突问题。
+
+## 附1：UTF-8 无 BOM 批量转换脚本
+
+### PowerShell 脚本
+
+PowerShell 脚本适用于当前 Windows 系统的默认代码页以及`UTF-8 带 BOM`转换为`UTF-8 无 BOM`。
+
+`Utf8Converter.ps1`：
+
+```powershell
+# 获取用户输入
+$directory = Read-Host "请输入要转换的完整目录路径"
+
+# 验证路径
+if (-not (Test-Path -Path $directory -PathType Container)) {
+    Write-Host "错误：路径 '$directory' 不存在或不是有效的目录！" -ForegroundColor Red
+    exit 1
+}
+
+# 定义要处理的文件类型
+$fileTypes = @("*.txt", "*.cpp", "*.cc", "*.h", "*.hpp", "*.ipp", "*.json", "*.ini", "*.log", "*.md", "*.xml", "*.html", "*.htm", "*.css", "*.js", "*.csv")
+
+# 获取文件列表
+$files = Get-ChildItem -Path $directory -Include $fileTypes -Recurse
+if ($files.Count -eq 0) {
+    Write-Host "在指定目录中未找到任何目标文件。" -ForegroundColor Yellow
+    exit 0
+}
+
+# 目标编码：UTF-8 无 BOM
+$targetEncoding = [System.Text.UTF8Encoding]::new($false)
+# 用于检测的严格UTF-8编码器（遇到无效字节会抛出异常）
+$utf8Strict = [System.Text.UTF8Encoding]::new($false, $true)
+
+$convertedCount = 0
+$skippedCount = 0
+
+# 处理每个文件
+foreach ($file in $files) {
+    try {
+        $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
+        if ($bytes.Length -eq 0) {
+            Write-Host "已跳过 (空文件): $($file.FullName)" -ForegroundColor DarkGray; $skippedCount++; continue
+        }
+
+        # 检查是否存在UTF-8 BOM (EF BB BF)
+        $hasBom = ($bytes.Count -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF)
+
+        try {
+            # 严格验证：如果不是UTF-8，会抛出异常
+            $utf8Strict.GetString($bytes) | Out-Null
+            
+            if ($hasBom) {
+                # 是带BOM的UTF-8，移除BOM
+                $content = [System.IO.File]::ReadAllText($file.FullName, [System.Text.Encoding]::UTF8)
+                [System.IO.File]::WriteAllText($file.FullName, $content, $targetEncoding)
+                Write-Host "转换成功 (移除BOM): $($file.FullName)" -ForegroundColor Gray; $convertedCount++
+            } else {
+                # 已经是UTF-8无BOM，跳过
+                Write-Host "已跳过 (已经是UTF-8无BOM): $($file.FullName)" -ForegroundColor Cyan; $skippedCount++
+            }
+        }
+        catch {
+            # 捕获到异常，说明是GBK等非UTF-8编码
+            $content = [System.IO.File]::ReadAllText($file.FullName, [System.Text.Encoding]::Default)
+            [System.IO.File]::WriteAllText($file.FullName, $content, $targetEncoding)
+            Write-Host "转换成功 (从 $([System.Text.Encoding]::Default.EncodingName) 转换): $($file.FullName)" -ForegroundColor Gray; $convertedCount++
+        }
+    }
+    catch {
+        Write-Host "处理失败: $($file.Name) - $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+
+# 输出总结
+Write-Host "`n处理完成！共转换 $($convertedCount) 个文件，跳过 $($skippedCount) 个文件。" -ForegroundColor Green
+Write-Host "按任意键退出..."; $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+```
+
+PowerShell 凭借其强大的 .NET Core/.NET Framework 后盾，可以非常精确地处理文本编码。此脚本的核心逻辑是“**先验证，后转换**”。
+
+处理逻辑：
+
+1. **严格的 UTF-8 验证**：脚本创建一个“严格模式”的 UTF-8 解码器。当尝试读取一个文件时，如果该文件不是有效的 UTF-8 编码（例如，它是一个 GBK 文件），解码器会立即抛出异常。
+2. **捕获异常并转换**：脚本通过 try...catch 机制捕获这个异常。一旦捕获，就意味着文件不是 UTF-8。此时，脚本会安全地使用系统默认编码（通常是 GBK）来读取内容，然后以 UTF-8 无 BOM 格式写回。
+3. **移除 BOM**：如果 try 块没有抛出异常，说明文件是有效的 UTF-8。但它可能带有 BOM。脚本会进一步检查文件头部是否存在 BOM，如果存在，则重新读取并以无 BOM 格式写回，实现“净化”。
+4. **跳过**：如果文件已经是完美的 UTF-8 无 BOM 格式，脚本会直接跳过，避免不必要的 I/O 操作。
+
+### Shell 脚本
+
+Shell 脚本适用于 `GB2312`、`GBK`、`GB18030`以及`UTF-8 带 BOM`转换为`UTF-8 无 BOM`：
+
+`Utf8Converter.sh`
+
+```bash
+#!/bin/bash
+
+# 定义要处理的文件扩展名
+FILE_EXTENSIONS=( "*.txt" "*.cpp" "*.cc" "*.h" "*.hpp" "*.ipp" "*.json" "*.ini" "*.log" "*.md" "*.xml" "*.html" "*.htm" "*.css" "*.js" "*.csv" )
+
+# 提示用户输入目录
+read -p "请输入要转换的完整目录路径: " directory
+
+# 检查目录是否存在
+if [ ! -d "$directory" ]; then
+    echo "错误：路径 '$directory' 不存在或不是一个有效的目录！"
+    exit 1
+fi
+
+echo ""
+
+# 构建find命令的参数
+find_args=()
+for ext in "${FILE_EXTENSIONS[@]}"; do
+    find_args+=(-o -name "$ext")
+done
+unset find_args[0] # 移除第一个多余的 -o
+
+# 查找文件并处理
+find "$directory" \( "${find_args[@]}" \) -type f -print0 | while IFS= read -r -d '' file; do
+    
+    if [ ! -s "$file" ]; then # 跳过空文件
+        echo "已跳过 (空文件): $file"; continue
+    fi
+
+    # 使用 iconv 验证文件是否为有效的UTF-8。我们将输出重定向，只关心退出码。
+    if iconv -f UTF-8 -t UTF-8 "$file" >/dev/null 2>&1; then
+        # 如果 iconv 成功，说明文件是有效的UTF-8，但可能带BOM
+        bom=$(head -c 3 "$file" | hexdump -e '1/1 "%02X"')
+        if [ "$bom" = "EFBBBF" ]; then
+            echo "正在移除BOM: $file"
+            tmp_file=$(mktemp)
+            if sed '1s/^\xef\xbb\xbf//' "$file" > "$tmp_file"; then
+                 mv "$tmp_file" "$file"
+            else
+                 echo "移除BOM失败: $file"; rm "$tmp_file"
+            fi
+        else
+            echo "已跳过 (已经是UTF-8无BOM): $file"
+        fi
+    else
+        # 如果 iconv 失败，说明文件不是UTF-8。我们假设它是GB18030进行转换。
+        # GB18030 是 GBK 的超集，兼容性更好。
+        echo "检测到非UTF-8，假设为GB18030并转换: $file"
+        tmp_file=$(mktemp)
+        if iconv -f GB18030 -t UTF-8//IGNORE "$file" -o "$tmp_file"; then
+            mv "$tmp_file" "$file"
+        else
+            echo "转换失败: $file"; rm "$tmp_file"
+        fi
+    fi
+done
+
+echo ""
+echo "处理完成！"
+```
+
+在 Linux 环境中，同样使用“**先验证，后转换**”的逻辑，可以使用 iconv 来验证文件是否为 UTF-8 编码，并进行转换。
+
+处理逻辑：
+
+- **UTF-8验证**：执行 `iconv -f UTF-8 -t UTF-8 "$file"`。如果命令成功（退出码0），文件就是有效的 UTF-8。如果失败（退出码非0），则不是。
+- **假设与转换**：对于验证失败的文件，脚本假设其为 GB18030 编码（ GBK 的超集，最能兼容中文环境）并进行转换。
+- **BOM处理**：对于验证成功的 UTF-8 文件，脚本会进一步检查并移除 BOM。
+
+也可以使用 uchardet 工具，可以更精准地检测文件编码。
+
+## 附2：一个轻量级的 C++编码转换库
+
+[`EncodingUtil`](https://github.com/KerwinCode/EncodingUtil) 是一个跨平台的、仅需头文件的 C++库，专注于 `UTF-8` 和 `GBK` 两种编码的检测与相互转换。它零依赖（在各平台均使用系统原生 API），并为 `string_view` 和 `u8string` 提供了现代化的接口。
 
 ## 参考资料
 
