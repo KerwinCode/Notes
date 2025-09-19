@@ -138,5 +138,29 @@ grep -rlI $'\xEF\xBB\xBF' . | xargs sed -i 's/\xEF\xBB\xBF//'
     - `grep -rlI`：递归查找包含 BOM 的文件（`-r`递归，`-l`仅输出文件名，`-I`忽略二进制文件）
 
     - `sed -i`：直接修改文件内容
-
 - macOS 兼容：需先安装 GNU sed：`brew install gnu-sed`，再用 `gsed` 替代 `sed`
+
+## 修复失效的软链接
+
+如果软链接的目标文件仍然存在，只是路径发生了变化（例如整个目录被移动），可以尝试批量更新它们指向的目标路径。
+
+可以使用 find 与 sed 进行批量路径替换
+
+适用于：失效软链接的旧目标路径有统一的、可批量替换的前缀。
+
+
+```bash
+find . -maxdepth 1 -type l -exec sh -c 'target=$(readlink "$1"); if [ ! -e "$1" ]; then new_target=$(echo "$target" | sed "s|^/old/path|/new/path|"); ln -sfn "$new_target" "$1"; echo "已修复: $1"; fi' sh {} \;
+```
+
+命令解释：
+
+`target=$(readlink "$1")`：获取当前软链接原本指向的目标路径。
+
+`if [ ! -e "$1" ]; then`：判断当前软链接是否失效。
+
+`new_target=$(echo "$target" | sed "s|^/old/path|/new/path|")`：使用 sed命令将旧路径前缀`/old/path`替换为新前缀`/new/path`。
+
+`ln -sfn "$new_target" "$1"`：使用`ln -sfn`命令强制 （`-f`）重新创建同名软链接，指向新的目标路径（`$new_target`），`-n`选项用于处理目标是软链接的情况。
+
+使用时请注意将示例中的`/old/path`和`/new/path`替换为你实际的旧路径前缀和新路径前缀。
