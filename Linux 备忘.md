@@ -93,38 +93,61 @@ which cmake
 /usr/bin/cmake
 ```
 
-如果是 windows，powershell 可以使用 `Get-Command`、`where.exe`：
+如果是 Windows，Powershell 可以使用 `Get-Command`、`where.exe`：
 
 ```powershell
-PS C:\Users\A1387> Get-Command cmake
+PS C:\Users\Kerwin> Get-Command cmake
 
 CommandType     Name                                               Version    Source
 -----------     ----                                               -------    ------
 Application     cmake.exe                                          3.25.2.0   D:\CLion 2023.1.4\bin\cmake\win\x64\bin\cmake.exe
 
-PS C:\Users\A1387> where.exe cmake
+PS C:\Users\Kerwin> where.exe cmake
 D:\CLion 2023.1.4\bin\cmake\win\x64\bin\cmake.exe
 ```
 
 > CMD 终端直接使用 **`where`** 即可。powershell 终端要强调 `.exe` 是因为 where 这个名字被用作另一个东西的别名了。
 
-## Debian 和 Ubuntu 系列 Linux 发行版的包管理工具 - `apt`
+## `apt` 与 `apt-get`
 
-`apt` 是一个用于 Debian 和 Ubuntu 系列 Linux 发行版的包管理工具。它提供了简单的方法来安装、更新和删除软件包。基本用法包括：
+`apt` 和 `apt-get` 是 Debian 及其衍生发行版（如 Ubuntu）中用于管理软件包的命令行工具。`apt-get` 发布于1998年，而 `apt` 发布于2014年，是 `apt-get` 的一个更新、更友好的版本，旨在改善交互式用户体验。
 
-```bash
-sudo apt update              # 更新软件包列表
-sudo apt install [package]   # 安装指定的软件包
-sudo apt remove [package]    # 卸载指定的软件包
-```
+以下是 `apt` 和 `apt-get` 之间的主要区别：
 
-安装的库通常位于 `/usr/lib/x86_64-linux-gnu`，头文件位于 `/usr/include`。使用以下命令可以查看某个包的安装位置：
+| 特性 | `apt` | `apt-get` |
+| --- | --- | --- |
+| **目标用户** | 最终用户（交互式使用） | 脚本和后端工具 |
+| **功能** | 整合了 `apt-get` 和 `apt-cache` 的常用功能 | 更底层，专注于包的安装、升级和移除 |
+| **用户体验** | 更友好，提供进度条、彩色输出等 | 输出更偏向机器可读，适合脚本解析 |
+| **稳定性** | 输出格式可能会在不同版本间变化 | 命令和输出格式保持向后兼容，适合脚本使用 |
 
-```bash
-dpkg -L [package]
-```
 
-- 优点：apt 可以自动处理依赖关系，并且从官方源中安装软件相对安全和可靠。
+下面是它们常用命令的对比整理:
+
+
+| 功能描述 | 新的 `apt` 命令 | 旧的 `apt-get` / `apt-cache` 命令 | 备注 |
+| --- | --- | --- | --- |
+| **更新软件包列表** | `sudo apt update` | `sudo apt-get update` | 功能相同，但 `apt` 会额外提示有多少个包可以升级。 |
+| **升级已安装的包** | `sudo apt upgrade` | `sudo apt-get upgrade` | `apt upgrade` 会在需要时**安装新依赖**，行为更智能。 `apt-get upgrade` 则不会。 |
+| **完整升级系统** | `sudo apt full-upgrade` | `sudo apt-get dist-upgrade` | 功能基本相同，处理依赖关系变化，可能会卸载旧包。`apt` 只是换了个更清晰的名称。 |
+| **安装软件包** | `sudo apt install <包名>` | `sudo apt-get install <包名>` | 功能相同，但 `apt` 会提供进度条。 |
+| **卸载软件包** | `sudo apt remove <包名>` | `sudo apt-get remove <包名>` | 功能相同，只移除软件包，保留配置文件。 |
+| **彻底卸载软件包** | `sudo apt purge <包名>` | `sudo apt-get purge <包名>` | 功能相同，同时移除软件包和其配置文件。 |
+| **搜索软件包** | `apt search <关键词>` | `apt-cache search <关键词>` | `apt` 整合了 `apt-cache` 的功能，无需切换命令。 |
+| **查看软件包信息** | `apt show <包名>` | `apt-cache show <包名>` | `apt` 整合了 `apt-cache` 的功能，输出的信息对用户更友好，隐藏了一些技术细节。 |
+| **列出软件包** | `apt list` | `dpkg -l` | `apt` 提供了更强大和易用的列表功能。 |
+| **列出可升级的包** | `apt list --upgradable` | `apt-get upgrade -s` (模拟) | `apt` 直接提供了专门的命令，非常方便。 |
+| **清理不再需要的包** | `sudo apt autoremove` | `sudo apt-get autoremove` | 功能相同，用于移除自动安装且不再被依赖的包。 |
+| **编辑源列表** | `apt edit-sources` | `(手动编辑文件)` | `apt` 提供了一个便捷的命令来直接编辑 `/etc/apt/sources.list` 文件。 |
+
+其他相关命令：
+
+- `dpkg -L <包名>` 查看一个包安装的所有文件和目录
+- `which <命令>` 快速查找可执行命令的路径
+- `whereis <命令>` 查找命令、源码和手册页的路径
+- `dpkg -S <路径>` 根据文件路径反查所属的软件包
+
+总而言之，对于日常在终端的手动操作，使用 `apt` 会更简单、更直观。而 `apt-get` 因为其稳定性和向后兼容性，仍然是编写自动化脚本时的首选。
 
 ## 去除 UTF-8 BOM 头
 
@@ -164,3 +187,4 @@ find . -maxdepth 1 -type l -exec sh -c 'target=$(readlink "$1"); if [ ! -e "$1" 
 `ln -sfn "$new_target" "$1"`：使用`ln -sfn`命令强制 （`-f`）重新创建同名软链接，指向新的目标路径（`$new_target`），`-n`选项用于处理目标是软链接的情况。
 
 使用时请注意将示例中的`/old/path`和`/new/path`替换为你实际的旧路径前缀和新路径前缀。
+
