@@ -59,8 +59,10 @@
 
     可写入`CMakePresets.json`文件中。
 
-    若需要静态链接`Xerces-C`，还需修改`cmake\init.cmake`，在 659 行左右添加：
+    Linux 上编译`Xerces-C`，需要加上`-fPIC`，可设置 CMake 变量 `"CMAKE_POSITION_INDEPENDENT_CODE": "ON"`。
 
+    若需要静态链接`Xerces-C`，还需修改`cmake\init.cmake`，在 659 行左右添加：
+    
     ```cmake
     # This should be in ace_group.cmake, but it's needed by build_ace_tao.cmake.
     if(OPENDDS_XERCES3)
