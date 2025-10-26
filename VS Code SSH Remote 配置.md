@@ -32,7 +32,7 @@ route -n
 192.168.171.0   0.0.0.0         255.255.255.0   U     100    0        0 ens33
 ```
 
-可参照上述命令结果填写网络配置，静态 IP 填写 192.168.171.171（或同网段其他IP），子网掩码填 255.255.255.0，默认网关填 192.168.171.2，DNS 添加  114.114.114.114（中国电信DNS） 和 8.8.8.8（Google DNS）。
+可参照上述命令结果填写网络配置，静态 IP 填写 192.168.171.171（或同网段其他IP），子网掩码填 255.255.255.0，默认网关填 192.168.171.2，DNS 添加  114.114.114.114（中国电信DNS） 和 8.8.8.8（Google DNS）。**如果是NAT网络模式下，DNS 可直接设为默认网关地址**（192.168.171.2），虚拟网络中的网关不仅负责路由，还承担了DNS代理或中转的角色。
 
 ## 连接配置
 
@@ -59,6 +59,12 @@ Mar 28 16:25:15 dev-pc sshd[6498]: Disconnected from user dev 192.168.171.1 port
 Mar 28 16:25:15 dev-pc sshd[6485]: pam_unix(sshd:session): session closed for user dev
 ```
 
+log出现类似：
+
+> Received request from 192.168.171.1 port 52468 to connect to host 127.0.0.1 port 36045, but the request was denied.
+
+这样的错误，表明允许端口转发是被禁止的。
+
 解决办法：
 
 ```bash
@@ -73,7 +79,7 @@ sudo systemctl restart sshd
 
 参考：<https://zhuanlan.zhihu.com/p/720810569>
 
-### 免密配置
+## 免密配置
 
 使用命令 ssh-keygen 生成新的密钥对。你可以选择在生成密钥对时为其指定不同的文件名。请注意，-f 后的 id_rsa_linux 和 id_rsa_windows 只是示例文件名，你可以根据需要选择其他文件名，也可以不指定文件名或其他参数。
 
@@ -96,6 +102,30 @@ sudo systemctl restart sshd
 打开你的 SSH 客户端（本机）配置文件（也就是前面生成的 config 文件，一般在 C:\Users\YourUsername\\.ssh\config），添加配置（IdentityFile 私钥文件路径），以指定使用哪个私钥文件。
 
 参考：<https://zhuanlan.zhihu.com/p/667236864>
+
+## 免密失效时的排查方法
+
+```bash
+# 检查 /etc/ssh/sshd_config
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2
+
+# 修复.ssh目录权限
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+
+# 检查服务器认证日志
+sudo tail -f /var/log/auth.log
+
+# 若出现
+Authentication refused: bad ownership or modes for directory /home/dev
+
+# 修复/home/dev目录权限（必须为755或700）
+sudo chmod 755 /home/dev
+
+# 确保目录所有者为dev用户
+sudo chown dev:dev /home/dev
+```
 
 ## 其他注意事项
 
