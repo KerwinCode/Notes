@@ -188,3 +188,232 @@ find . -maxdepth 1 -type l -exec sh -c 'target=$(readlink "$1"); if [ ! -e "$1" 
 
 使用时请注意将示例中的`/old/path`和`/new/path`替换为你实际的旧路径前缀和新路径前缀。
 
+## 安装和配置 MySQL
+
+安装和配置 MySQL 的详细步骤如下：
+
+1. 更新系统包索引
+
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
+
+2. 安装 MySQL Server
+
+```bash
+# 安装 MySQL 服务器（默认为 8.0 版本）
+sudo apt install mysql-server -y
+```
+
+3. 启动 MySQL 服务
+
+```bash
+# 启动 MySQL 服务
+sudo systemctl start mysql
+
+# 设置开机自启
+sudo systemctl enable mysql
+
+# 检查服务状态
+sudo systemctl status mysql
+```
+
+4. 运行安全配置脚本
+
+```bash
+# 运行安全安装向导
+sudo mysql_secure_installation
+```
+
+5. 配置 root 用户密码
+
+```bash
+# 登录 MySQL
+sudo mysql
+
+# 在 MySQL 中执行
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '你的密码';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+6. 基本配置调整
+
+编辑 MySQL 配置文件：
+
+```bash
+sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+```
+
+常用配置项：
+
+```ini
+[mysqld]
+# 绑定地址（允许远程访问改为 0.0.0.0）
+bind-address = 127.0.0.1
+
+# 字符集设置
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+# 最大连接数
+max_connections = 100
+
+# 启用二进制日志（主从复制需要）
+# server-id = 1
+# log_bin = /var/log/mysql/mysql-bin.log
+```
+
+7. 重启 MySQL 服务
+
+```bash
+sudo systemctl restart mysql
+```
+
+8. 常用管理命令
+
+```bash
+# 启动服务
+sudo systemctl start mysql
+
+# 停止服务
+sudo systemctl stop mysql
+
+# 重启服务
+sudo systemctl restart mysql
+
+# 查看服务状态
+sudo systemctl status mysql
+
+# 查看日志
+sudo tail -f /var/log/mysql/error.log
+```
+
+9. 创建新用户和数据库
+
+```sql
+-- 创建数据库
+CREATE DATABASE mydatabase;
+
+-- 创建用户
+CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'password';
+
+-- 授予权限
+GRANT ALL PRIVILEGES ON mydatabase.* TO 'myuser'@'localhost';
+
+-- 刷新权限
+FLUSH PRIVILEGES;
+```
+
+10. 防火墙配置（如果需要远程访问）
+
+```bash
+# 开放 MySQL 端口（默认 3306），有一定安全风险
+sudo ufw allow 3306/tcp
+sudo ufw reload
+```
+
+11. 备份和恢复
+
+```bash
+# 备份数据库
+mysqldump -u username -p database_name > backup.sql
+
+# 恢复数据库
+mysql -u username -p database_name < backup.sql
+```
+
+12. 忘记 root 密码处理方法
+
+```bash
+# 停止 MySQL 服务
+sudo systemctl stop mysql
+
+# 创建临时启动配置
+sudo mkdir -p /var/run/mysqld
+sudo chown mysql:mysql /var/run/mysqld
+
+# 跳过权限检查启动 MySQL
+sudo mysqld_safe --skip-grant-tables --skip-networking &
+
+# 无密码登录 MySQL
+mysql -u root
+
+# 在 MySQL 中执行（重要：8.0+专用语法）
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED BY '你的新密码';
+UNINSTALL COMPONENT "file://component_validate_password";  # 如果密码策略报错则先执行这行
+ALTER USER 'root'@'localhost' IDENTIFIED BY '你的新密码';  # 再次执行
+EXIT;
+
+# 关闭临时实例
+sudo mysqladmin -u root -p shutdown
+
+# 正常启动服务
+sudo systemctl start mysql
+```
+
+13. 卸载 MySQL 服务
+
+```bash
+# 检查安装包
+dpkg -l | grep mysql
+# 卸载 MySQL 服务
+sudo apt purge mysql-server mysql-server-8.0 mysql-server-core-8.0 
+```
+
+## 开启 FTP 服务
+
+安装 vsftpd，并开启服务：
+
+```bash
+sudo apt update
+sudo apt install vsftpd
+sudo systemctl start vsftpd
+sudo systemctl enable vsftpd
+```
+
+修改 vsftpd 配置：
+
+```bash
+sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.bak
+sudo vim /etc/vsftpd.conf # 禁止匿名登录
+anonymous_enable=NO
+# 允许本地用户登录
+local_enable=YES
+# 启用写入权限
+write_enable=YES
+# 将用户限制在其家目录中（增强安全）
+chroot_local_user=YES
+# 防止中文乱码
+utf8_filesystem=YES
+```
+
+重启 vsftpd 服务：
+
+```bash
+sudo systemctl restart vsftpd
+```
+
+## 离线安装 deb 包及依赖
+
+以下以 C++ 开发环境配置为情景介绍离线安装 deb 包及依赖的方法：
+
+需要准备两个系统版本号完全一致的 Linux 主机，一台可以连接互联网，用于下载 deb 包和依赖，另一台为离线安装的主机。
+
+首先，在可以连接互联网的机器上运行以下命令：
+
+```bash
+apt download $(apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks --no-replaces --no-enhances build-essential gdb ninja-build valgrind git vsfptd openssh-server pkg-config perl python3 | grep "^\w" | sort -u)
+
+apt download $(apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks --no-replaces --no-enhances libboost-all-dev libopencv-dev qtbase5-dev qt6-base-dev
+libssl-dev libcurl4-openssl-dev zlib1g-dev | grep "^\w" | sort -u)
+```
+
+deb 包会下载到当前目录下，打包传输到离线的主机上，并运行以下命令安装：
+
+```bash
+sudo dkpg -i *.deb
+```
+
